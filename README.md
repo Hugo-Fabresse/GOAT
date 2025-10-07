@@ -1,5 +1,9 @@
 # GOAT — Git Overhauled, Advanced & Tailored
 
+<p align="center">
+  <img src="GOAT.png" alt="GOAT logo" width="400">
+</p>
+
 **GOAT** is a lightweight, local-first version control system — built from scratch in C — reimagining Git’s core ideas to make them simpler, more understandable, and more adaptable.
 
 GOAT doesn’t aim to replace Git.
