@@ -10,7 +10,7 @@
  */
 
 #include "commands/init/init.h"
-#include "../../utils/fs.h"
+#include "utils/fs.h"
 #include <stdio.h>
 #include <stdbool.h>
 

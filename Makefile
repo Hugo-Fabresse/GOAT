@@ -4,7 +4,7 @@
 CC = gcc
 
 # Compilation flags
-CFLAGS = -Wall -Wextra -Werror -std=c99 -Iinclude
+CFLAGS = -Wall -Wextra -Werror -std=c99 -Iinclude -Isrc
 
 # Source directory
 SRC_DIR = src

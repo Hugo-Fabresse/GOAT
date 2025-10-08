@@ -14,7 +14,7 @@
 
 int main(int argc, char **argv)
 {
-    struct cmd_opts opts = {0, 0};
+    cmd_opts_t opts = {0, 0};
 
     if (argc < 2) {
         fprintf(stderr, "Usage: goat <command>\n");
