@@ -11,6 +11,7 @@
 
 #include "commands/init/init.h"
 #include "utils/fs.h"
+#include "ui/messages.h"
 #include <stdio.h>
 #include <stdbool.h>
 #include <string.h>
@@ -52,7 +53,10 @@ static int create_structure(void)
                   ? fs_create_dir(init_paths[i].path, init_paths[i].mode)
                   : fs_create_file(init_paths[i].path, init_paths[i].mode);
         if (res < 0) {
-            fprintf(stderr, "Failed to create %s\n", init_paths[i].path);
+            if (init_paths[i].is_dir)
+                MSG_CREATE_DIR_FAILED(init_paths[i].path);
+            else
+                MSG_CREATE_FILE_FAILED(init_paths[i].path);
             return -1;
         }
     }
@@ -70,7 +74,7 @@ int parse_init_options(int argc, char **argv, cmd_opts_t *opts)
         } else if (strcmp(argv[i], "--quiet") == 0) {
             opts->quiet = true;
         } else {
-            fprintf(stderr, "Unknown option: %s\n", argv[i]);
+            MSG_UNKNOWN_OPTION(argv[i]);
             return -1;
         }
     }
@@ -80,15 +84,15 @@ int parse_init_options(int argc, char **argv, cmd_opts_t *opts)
 int cmd_init(const cmd_opts_t *opts)
 {
     if (check_already_initialized() && !opts->force) {
-        fprintf(stderr, "GOAT repository already exists.\n");
+        fprintf(stderr, MSG_REPO_EXISTS);
         return 1;
     }
     if (create_structure() < 0) {
-        fprintf(stderr, "Failed to initialize GOAT repository.\n");
+        fprintf(stderr, MSG_INIT_FAILURE);
         return 2;
     }
     if (!opts->quiet) {
-        printf("Initialized empty GOAT repository in ./.goat\n");
+        printf(MSG_INIT_SUCCESS);
     }
     return 0;
 }
