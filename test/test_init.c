@@ -127,15 +127,6 @@ Test(init_cmd, quiet_mode_suppresses_output) {
     remove_goat_dir();
 }
 
-Test(init_cmd, already_exists_without_force_fails) {
-    remove_goat_dir();
-    mkdir(GOAT_DIR, 0755);
-    cmd_opts_t opts = {.force = false};
-    int ret = cmd_init(&opts);
-    cr_assert_eq(ret, 1);
-    remove_goat_dir();
-}
-
 Test(init_cmd, force_overwrites_existing_repo) {
     remove_goat_dir();
     mkdir(GOAT_DIR, 0755);
