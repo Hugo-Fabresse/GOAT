@@ -8,9 +8,9 @@
  * Author: Aliago
  */
 
+#include "commands/init/init.h"
 #include <stdio.h>
 #include <string.h>
-#include "commands/init/init.h"
 
 int main(int argc, char **argv)
 {
@@ -21,6 +21,9 @@ int main(int argc, char **argv)
         return 1;
     }
     if (strcmp(argv[1], "init") == 0) {
+        if (parse_init_options(argc, argv, &opts) < 0) {
+            return 1;
+        }
         return cmd_init(&opts);
     }
     fprintf(stderr, "Unknown command: %s\n", argv[1]);

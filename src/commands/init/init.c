@@ -13,6 +13,7 @@
 #include "utils/fs.h"
 #include <stdio.h>
 #include <stdbool.h>
+#include <string.h>
 
 #define GOAT_DIR       ".goat"
 #define OBJECTS_DIR    ".goat/objects"
@@ -44,13 +45,32 @@ static bool check_already_initialized(void)
 static int create_structure(void)
 {
     int count = sizeof(init_paths) / sizeof(init_paths[0]);
+    int res = 0;
 
     for (int i = 0; i < count; i++) {
-        int res = init_paths[i].is_dir
+        res = init_paths[i].is_dir
                   ? fs_create_dir(init_paths[i].path, init_paths[i].mode)
                   : fs_create_file(init_paths[i].path, init_paths[i].mode);
         if (res < 0) {
             fprintf(stderr, "Failed to create %s\n", init_paths[i].path);
+            return -1;
+        }
+    }
+    return 0;
+}
+
+int parse_init_options(int argc, char **argv, cmd_opts_t *opts)
+{
+    opts->force = false;
+    opts->quiet = false;
+
+    for (int i = 2; i < argc; i++) {
+        if (strcmp(argv[i], "--force") == 0) {
+            opts->force = true;
+        } else if (strcmp(argv[i], "--quiet") == 0) {
+            opts->quiet = true;
+        } else {
+            fprintf(stderr, "Unknown option: %s\n", argv[i]);
             return -1;
         }
     }
