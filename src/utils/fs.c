@@ -9,7 +9,7 @@
  * Author: Aliago
  */
 
-#include "fs.h"
+#include "utils/fs.h"
 #include <sys/stat.h>
 #include <errno.h>
 #include <stdio.h>
