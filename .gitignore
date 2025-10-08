@@ -1,2 +1,5 @@
 # .gitignore
 /.idea/
+
+# Fichiers objets
+*.o
