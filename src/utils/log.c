@@ -1,6 +1,6 @@
 /*
  * File: log.c
- * Description: ${DESCRIPTION}
+ * Description: Logging utility functions for printing messages with different log levels.
  * Date: 08/10/2025
  * Author: Aliago
  */

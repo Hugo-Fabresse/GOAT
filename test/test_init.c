@@ -1,5 +1,5 @@
 /*
- * File: init_tests.c
+ * File: test_init.c
  * Description: Unit tests for the 'init' command in GOAT.
  *              Provides full deterministic testing for:
  *              - Option parsing (--force, --quiet)
@@ -22,15 +22,40 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <dirent.h>
 
 #define GOAT_DIR ".goat"
 
 // --- Helpers ---
+// Recursively delete a directory and its contents
+static int rm_rf(const char *path) {
+    struct stat st;
+    if (stat(path, &st) != 0) return 0;
+    if (S_ISDIR(st.st_mode)) {
+        DIR *dir = opendir(path);
+        if (!dir) return -1;
+        struct dirent *entry;
+        char buf[4096];
+        int ret = 0;
+        while ((entry = readdir(dir)) != NULL) {
+            if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
+                continue;
+            snprintf(buf, sizeof(buf), "%s/%s", path, entry->d_name);
+            ret = rm_rf(buf);
+            if (ret != 0) break;
+        }
+        closedir(dir);
+        if (ret == 0) ret = rmdir(path);
+        return ret;
+    } else {
+        return unlink(path);
+    }
+}
 
 static void remove_goat_dir(void) {
     struct stat st;
     if (stat(GOAT_DIR, &st) == 0)
-        system("rm -rf .goat");
+        rm_rf(GOAT_DIR);
 }
 
 static bool path_exists(const char *path) {

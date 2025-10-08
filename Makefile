@@ -35,8 +35,8 @@ all: $(BUILD_DIR) $(TARGET)
 # Unit tests
 # -------------------------------
 TEST_SRC = test/test_init.c
-TEST_OBJ = $(BUILD_DIR)/init_tests.o
-TEST_BIN = $(BUILD_DIR)/init_tests
+TEST_OBJ = $(BUILD_DIR)/test_init.o
+TEST_BIN = $(BUILD_DIR)/test_init
 
 TEST_OBJS = $(BUILD_DIR)/utils/fs.o \
             $(BUILD_DIR)/commands/init/init.o \
@@ -48,7 +48,7 @@ tests: $(TEST_BIN)
 $(TEST_BIN): $(TEST_OBJ) $(TEST_OBJS)
 	$(CC) $(CFLAGS) $(COVFLAGS) $^ -o $@ -lcriterion
 
-$(TEST_OBJ): $(TEST_SRC)
+$(TEST_OBJ): $(TEST_SRC) $(BUILD_DIR)
 	$(CC) $(CFLAGS) $(COVFLAGS) -Itest -c $< -o $@
 
 # -------------------------------
