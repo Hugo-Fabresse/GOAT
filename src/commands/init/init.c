@@ -16,6 +16,7 @@
 #include <stdbool.h>
 #include <string.h>
 
+// Repository structure constants
 #define GOAT_DIR       ".goat"
 #define OBJECTS_DIR    ".goat/objects"
 #define REFS_DIR       ".goat/refs"
@@ -24,6 +25,7 @@
 #define CONFIG_FILE    ".goat/config"
 #define INDEX_FILE     ".goat/index"
 
+// Paths to create with their modes and types
 static const struct path_mode {
     const char *path;
     int mode;
@@ -38,29 +40,58 @@ static const struct path_mode {
         {INDEX_FILE,  0644, false}
 };
 
+// Option mapping array
+static const option_entry_t option_map[] = {
+        {"--force", set_force},
+        {"--quiet", set_quiet}
+};
+
 static bool check_already_initialized(void)
 {
     return fs_dir_exists(GOAT_DIR);
 }
 
+static int create_path(const struct path_mode *p)
+{
+    int res = p->is_dir ? fs_create_dir(p->path, p->mode)
+                        : fs_create_file(p->path, p->mode);
+
+    if (res < 0) {
+        if (p->is_dir) {
+            MSG_CREATE_DIR_FAILED(p->path);
+        }
+        else {
+            MSG_CREATE_FILE_FAILED(p->path);
+        }
+        return -1;
+    }
+    return 0;
+}
+
 static int create_structure(void)
 {
-    int count = sizeof(init_paths) / sizeof(init_paths[0]);
-    int res = 0;
+    size_t init_count = sizeof(init_paths)/sizeof(init_paths[0]);
 
-    for (int i = 0; i < count; i++) {
-        res = init_paths[i].is_dir
-                  ? fs_create_dir(init_paths[i].path, init_paths[i].mode)
-                  : fs_create_file(init_paths[i].path, init_paths[i].mode);
-        if (res < 0) {
-            if (init_paths[i].is_dir)
-                MSG_CREATE_DIR_FAILED(init_paths[i].path);
-            else
-                MSG_CREATE_FILE_FAILED(init_paths[i].path);
+    for (size_t i = 0; i < init_count; i++) {
+        if (create_path(&init_paths[i]) < 0) {
             return -1;
         }
     }
     return 0;
+}
+
+static int handle_option(const char *arg, cmd_opts_t *opts)
+{
+    size_t option_count = sizeof(option_map)/sizeof(option_map[0]);
+
+    for (size_t j = 0; j < option_count; j++) {
+        if (strcmp(arg, option_map[j].name) == 0) {
+            option_map[j].set_option(opts);
+            return 0;
+        }
+    }
+    MSG_UNKNOWN_OPTION(arg);
+    return -1;
 }
 
 int parse_init_options(int argc, char **argv, cmd_opts_t *opts)
@@ -69,12 +100,7 @@ int parse_init_options(int argc, char **argv, cmd_opts_t *opts)
     opts->quiet = false;
 
     for (int i = 2; i < argc; i++) {
-        if (strcmp(argv[i], "--force") == 0) {
-            opts->force = true;
-        } else if (strcmp(argv[i], "--quiet") == 0) {
-            opts->quiet = true;
-        } else {
-            MSG_UNKNOWN_OPTION(argv[i]);
+        if (handle_option(argv[i], opts) < 0) {
             return -1;
         }
     }
@@ -84,15 +110,15 @@ int parse_init_options(int argc, char **argv, cmd_opts_t *opts)
 int cmd_init(const cmd_opts_t *opts)
 {
     if (check_already_initialized() && !opts->force) {
-        fprintf(stderr, MSG_REPO_EXISTS);
+        MSG_REPO_EXISTS;
         return 1;
     }
     if (create_structure() < 0) {
-        fprintf(stderr, MSG_INIT_FAILURE);
+        MSG_INIT_FAILURE;
         return 2;
     }
     if (!opts->quiet) {
-        printf(MSG_INIT_SUCCESS);
+        MSG_INIT_SUCCESS;
     }
     return 0;
 }
