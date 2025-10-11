@@ -9,8 +9,8 @@
  */
 
 #include "commands/init/init.h"
+#include "commands/add/add.h"
 #include "ui/messages.h"
-#include <stdio.h>
 #include <string.h>
 
 int print_usage(const char *progname)
@@ -21,7 +21,7 @@ int print_usage(const char *progname)
 
 int main(int argc, char **argv)
 {
-    cmd_opts_t opts = {0, 0};
+    cmd_opts_t opts = {0};
 
     if (argc < 2) {
         return print_usage(argv[0]);
@@ -31,6 +31,12 @@ int main(int argc, char **argv)
             return 1;
         }
         return cmd_init(&opts);
+    }
+    if (strcmp(argv[1], "add") == 0) {
+        if (parse_add_options(argc, argv, &opts) < 0) {
+            return 1;
+        }
+        return cmd_add(&opts);
     }
     MSG_UNKNOWN_COMMAND(argv[1]);
     return print_usage(argv[0]);
