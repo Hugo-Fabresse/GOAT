@@ -36,12 +36,23 @@ static const command_options_t add_cmd_opts = {
 
 static void process_file(const char *path, const char *repo_root)
 {
+    FILE *f;
+
+    if (access(path, R_OK) != 0) {
+        fprintf(stderr, "Unable to read : %s\n", path + strlen(repo_root) + 1);
+        return;
+    }
+    f = fopen(path, "rb");
+    if (!f) {
+        fprintf(stderr, "Opening error : %s\n", path);
+        return;
+    }
     if (strncmp(path, repo_root, strlen(repo_root)) == 0) {
         printf("Found file: %s\n", path + strlen(repo_root) + 1);
     } else {
         printf("Found file: %s\n", path);
     }
-    // TODO: compute hash + add to staging later
+    fclose(f);
 }
 
 static void process_entry(const char *dir, const struct dirent *entry, const char *repo_root)
@@ -96,6 +107,7 @@ int cmd_add(const cmd_opts_t *opts)
     repo_path[strlen(repo_path) - 5] = '\0';
     if (opts->cmd_specific.add.all) {
         list_all_files(repo_path, repo_path);
+        return 0;
     }
     return 0;
 }
