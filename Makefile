@@ -20,6 +20,7 @@ TARGET = $(BUILD_DIR)/goat
 
 # Source files
 SRCS = $(SRC_DIR)/main.c \
+       $(SRC_DIR)/core/goat.c \
        $(SRC_DIR)/utils/fs.c \
        $(SRC_DIR)/utils/log.c \
        $(SRC_DIR)/utils/repo.c \
