@@ -21,6 +21,8 @@ TARGET = $(BUILD_DIR)/goat
 # Source files
 SRCS = $(SRC_DIR)/main.c \
        $(SRC_DIR)/core/goat.c \
+       $(SRC_DIR)/core/hash.c \
+       $(SRC_DIR)/core/index.c \
        $(SRC_DIR)/utils/fs.c \
        $(SRC_DIR)/utils/log.c \
        $(SRC_DIR)/utils/repo.c \
@@ -73,7 +75,7 @@ coverage: tests
 # Build binary
 # -------------------------------
 $(TARGET): $(OBJS)
-	$(CC) $(CFLAGS) -o $@ $^
+	$(CC) $(CFLAGS) -o $@ $^ -lssl -lcrypto
 
 # Compile .c files to .o (gère les sous-dossiers)
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.c

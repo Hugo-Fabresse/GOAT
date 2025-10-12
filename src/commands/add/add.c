@@ -9,6 +9,8 @@
 
 #include "commands/add/add.h"
 #include "core/command.h"
+#include "core/hash.h"
+#include "core/index.h"
 #include "utils/fs.h"
 #include "utils/repo.h"
 #include "ui/messages.h"
@@ -18,6 +20,7 @@
 #include <sys/stat.h>
 #include <string.h>
 #include <unistd.h>
+#include <openssl/sha.h>
 
 void list_all_files(const char *dir, const char *repo_root);
 
@@ -36,23 +39,20 @@ static const command_options_t add_cmd_opts = {
 
 static void process_file(const char *path, const char *repo_root)
 {
-    FILE *f;
+    unsigned char hash[SHA256_DIGEST_LENGTH];
+    const char *rel_path;
 
     if (access(path, R_OK) != 0) {
         fprintf(stderr, "Unable to read : %s\n", path + strlen(repo_root) + 1);
         return;
     }
-    f = fopen(path, "rb");
-    if (!f) {
-        fprintf(stderr, "Opening error : %s\n", path);
+    if (hash_file_sha256(path, hash) != 0) {
+        fprintf(stderr, "Hash error : %s\n", path);
         return;
     }
-    if (strncmp(path, repo_root, strlen(repo_root)) == 0) {
-        printf("Found file: %s\n", path + strlen(repo_root) + 1);
-    } else {
-        printf("Found file: %s\n", path);
-    }
-    fclose(f);
+    rel_path = path + strlen(repo_root) + 1;
+    printf("Staged: %s\n", rel_path);
+    update_index(rel_path, hash);
 }
 
 static void process_entry(const char *dir, const struct dirent *entry, const char *repo_root)
