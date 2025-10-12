@@ -11,41 +11,44 @@
 #include "utils/log.h"
 #include <string.h>
 #include <stdio.h>
+#include <stddef.h>
 
-// Print usage for a specific command
-void print_command_usage(const char *command_name, const option_entry_t *options, size_t num_options) {
-    MSG_COMMAND_USAGE_HEADER(command_name);
-
-    for (size_t i = 0; i < num_options; i++) {
-        MSG_COMMAND_OPTION(options[i].name, options[i].description);
+void print_command_usage(const command_options_t *cmd_opts)
+{
+    MSG_COMMAND_USAGE_HEADER(cmd_opts->command_name);
+    for (size_t i = 0; i < cmd_opts->num_options; i++) {
+        MSG_COMMAND_OPTION(cmd_opts->options[i].name, cmd_opts->options[i].description);
     }
 }
 
-// Common option parsing utility
-int parse_options(int argc, char **argv, const char *command_name,
-                  const option_entry_t *options, size_t num_options,
-                  cmd_opts_t *opts) {
+static int find_option_index(const command_options_t *cmd_opts, const char *option_name)
+{
+    for (size_t j = 0; j < cmd_opts->num_options; j++) {
+        if (strcmp(option_name, cmd_opts->options[j].name) == 0) {
+            return (int)j;
+        }
+    }
+    return -1;
+}
+
+static int handle_option(const command_options_t *cmd_opts, cmd_opts_t *opts, const char *option_name)
+{
+    int idx = find_option_index(cmd_opts, option_name);
+
+    if (idx >= 0) {
+        cmd_opts->options[idx].set_option(opts);
+        return 0;
+    } else {
+        MSG_UNKNOWN_OPTION(option_name);
+        print_command_usage(cmd_opts);
+        return -1;
+    }
+}
+
+int parse_options(int argc, char **argv, const command_options_t *cmd_opts, cmd_opts_t *opts)
+{
     for (int i = 2; i < argc; i++) {
-        if (argv[i][0] != '-' || argv[i][1] != '-') {
-            MSG_UNKNOWN_OPTION(argv[i]);
-            print_command_usage(command_name, options, num_options);
-            return -1;
-        }
-
-        const char *option_name = argv[i] + 2; // Skip "--"
-        bool found = false;
-
-        for (size_t j = 0; j < num_options; j++) {
-            if (strcmp(option_name, options[j].name) == 0) {
-                options[j].set_option(opts);
-                found = true;
-                break;
-            }
-        }
-
-        if (!found) {
-            MSG_UNKNOWN_OPTION(argv[i]);
-            print_command_usage(command_name, options, num_options);
+        if (handle_option(cmd_opts, opts, argv[i]) < 0) {
             return -1;
         }
     }

@@ -40,7 +40,7 @@
 #define MSG_COMMAND_USAGE_HEADER(cmd) \
     log_msg(LOG_DEFAULT, COLOR_BLUE "usage: goat %s [<options>]\n" COLOR_RESET "\n", cmd)
 #define MSG_COMMAND_OPTION(option, description) \
-    log_msg(LOG_DEFAULT, "    --%-12s %s\n", option, description)
+    log_msg(LOG_DEFAULT, "    %-12s %s\n", option, description)
 
 // ===== Add Command Messages =====
 #define MSG_NO_REPO_EXISTS \

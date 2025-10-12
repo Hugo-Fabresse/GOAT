@@ -11,19 +11,11 @@
 #include "commands/init/init.h"
 #include "core/command.h"
 #include "utils/fs.h"
+#include "utils/repo.h"
 #include "ui/messages.h"
 #include <stdio.h>
 #include <stdbool.h>
 #include <string.h>
-
-// Repository structure constants
-#define GOAT_DIR       ".goat"
-#define OBJECTS_DIR    ".goat/objects"
-#define REFS_DIR       ".goat/refs"
-#define HEADS_DIR      ".goat/refs/heads"
-#define HEAD_FILE      ".goat/HEAD"
-#define CONFIG_FILE    ".goat/config"
-#define INDEX_FILE     ".goat/index"
 
 // Paths to create with their modes and types
 static const struct path_mode {
@@ -42,14 +34,16 @@ static const struct path_mode {
 
 // Option definitions for init command
 static const option_entry_t init_options[] = {
-    {"force", "Reinitialize and overwrite an existing repository", set_force},
-    {"quiet", "Suppress output messages", set_quiet}
+    {"--force", "Reinitialize and overwrite an existing repository", set_force},
+    {"--quiet", "Suppress output messages", set_quiet}
 };
 
-static bool check_already_initialized(void)
-{
-    return fs_dir_exists(GOAT_DIR);
-}
+// Command options structure
+static const command_options_t init_cmd_opts = {
+    .command_name = "init",
+    .options = init_options,
+    .num_options = sizeof(init_options)/sizeof(init_options[0])
+};
 
 static int create_path(const struct path_mode *p)
 {
@@ -84,10 +78,7 @@ int parse_init_options(int argc, char **argv, cmd_opts_t *opts)
 {
     opts->cmd_specific.init.force = false;
     opts->cmd_specific.init.quiet = false;
-
-    // Use common parsing utility
-    return parse_options(argc, argv, "init", init_options,
-                        sizeof(init_options)/sizeof(init_options[0]), opts);
+    return parse_options(argc, argv, &init_cmd_opts, opts);
 }
 
 int cmd_init(const cmd_opts_t *opts)

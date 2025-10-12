@@ -22,6 +22,7 @@ TARGET = $(BUILD_DIR)/goat
 SRCS = $(SRC_DIR)/main.c \
        $(SRC_DIR)/utils/fs.c \
        $(SRC_DIR)/utils/log.c \
+       $(SRC_DIR)/utils/repo.c \
        $(SRC_DIR)/core/command.c \
        $(SRC_DIR)/commands/init/init.c \
        $(SRC_DIR)/commands/init/init_handlers.c \
@@ -43,6 +44,7 @@ TEST_BIN = $(BUILD_DIR)/test_init
 
 TEST_OBJS = $(BUILD_DIR)/utils/fs.o \
             $(BUILD_DIR)/utils/log.o \
+            $(BUILD_DIR)/utils/repo.o \
             $(BUILD_DIR)/core/command.o \
             $(BUILD_DIR)/commands/init/init.o \
             $(BUILD_DIR)/commands/init/init_handlers.o \

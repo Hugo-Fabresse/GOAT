@@ -38,10 +38,14 @@ typedef struct option_entry {
     void (*set_option)(cmd_opts_t *);
 } option_entry_t;
 
-// Common parsing utilities
-int parse_options(int argc, char **argv, const char *command_name,
-                  const option_entry_t *options, size_t num_options,
-                  cmd_opts_t *opts);
-void print_command_usage(const char *command_name, const option_entry_t *options, size_t num_options);
+// Common structure for control options
+typedef struct {
+    const char *command_name;
+    const option_entry_t *options;
+    size_t num_options;
+} command_options_t;
+
+void print_command_usage(const command_options_t *cmd_opts);
+int parse_options(int argc, char **argv, const command_options_t *cmd_opts, cmd_opts_t *opts);
 
 #endif // CORE_COMMAND_H
