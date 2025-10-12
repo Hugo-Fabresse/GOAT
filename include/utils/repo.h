@@ -11,6 +11,7 @@
 #define REPO_H
 
 #include <stdbool.h>
+#include <stddef.h>
 
 // Repository structure constants
 #define GOAT_DIR       ".goat"
@@ -21,6 +22,9 @@
 #define CONFIG_FILE    ".goat/config"
 #define INDEX_FILE     ".goat/index"
 
+#define PATH_MAX 4096
+
 bool check_already_initialized(void);
+bool find_goat_repo(char *repo_path, size_t size);
 
 #endif // REPO_H

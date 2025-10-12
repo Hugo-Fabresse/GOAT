@@ -19,10 +19,6 @@
 #include <string.h>
 #include <unistd.h>
 
-#ifndef PATH_MAX
-#define PATH_MAX 4096
-#endif // PATH_MAX
-
 void list_all_files(const char *dir, const char *repo_root);
 
 // Option definitions for add command
@@ -80,28 +76,6 @@ void list_all_files(const char *dir, const char *repo_root)
         process_entry(dir, entry, repo_root);
     }
     closedir(d);
-}
-
-bool find_goat_repo(char *repo_path, size_t size)
-{
-    char cwd[PATH_MAX];
-    struct stat st;
-    char *slash;
-
-    if (!getcwd(cwd, sizeof(cwd))) {
-        return false;
-    }
-    while (1) {
-        snprintf(repo_path, size, "%s/.goat", cwd);
-        if (stat(repo_path, &st) == 0 && S_ISDIR(st.st_mode)) {
-            return true;
-        }
-        slash = strrchr(cwd, '/');
-        if (!slash || cwd == slash)
-            break;
-        *slash = '\0';
-    }
-    return false;
 }
 
 int parse_add_options(int argc, char **argv, cmd_opts_t *opts)
