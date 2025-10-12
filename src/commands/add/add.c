@@ -14,6 +14,16 @@
 #include "ui/messages.h"
 #include <stdio.h>
 #include <stdbool.h>
+#include <dirent.h>
+#include <sys/stat.h>
+#include <string.h>
+#include <unistd.h>
+
+#ifndef PATH_MAX
+#define PATH_MAX 4096
+#endif // PATH_MAX
+
+void list_all_files(const char *dir, const char *repo_root);
 
 // Option definitions for add command
 static const option_entry_t add_options[] = {
@@ -28,6 +38,72 @@ static const command_options_t add_cmd_opts = {
     .num_options = sizeof(add_options)/sizeof(add_options[0])
 };
 
+static void process_file(const char *path, const char *repo_root)
+{
+    if (strncmp(path, repo_root, strlen(repo_root)) == 0) {
+        printf("Found file: %s\n", path + strlen(repo_root) + 1);
+    } else {
+        printf("Found file: %s\n", path);
+    }
+    // TODO: compute hash + add to staging later
+}
+
+static void process_entry(const char *dir, const struct dirent *entry, const char *repo_root)
+{
+    char path[PATH_MAX];
+    struct stat st;
+
+    snprintf(path, sizeof(path), "%s/%s", dir, entry->d_name);
+    if (stat(path, &st) == -1) {
+        return;
+    }
+    if (S_ISDIR(st.st_mode)) {
+        list_all_files(path, repo_root);
+    } else if (S_ISREG(st.st_mode)) {
+        process_file(path, repo_root);
+    }
+}
+
+void list_all_files(const char *dir, const char *repo_root)
+{
+    DIR *d = opendir(dir);
+    struct dirent *entry;
+
+    if (!d) {
+        return;
+    }
+    while ((entry = readdir(d)) != NULL) {
+        if (strcmp(entry->d_name, ".") == 0 ||
+            strcmp(entry->d_name, "..") == 0 ||
+            strcmp(entry->d_name, ".goat") == 0)
+            continue;
+        process_entry(dir, entry, repo_root);
+    }
+    closedir(d);
+}
+
+bool find_goat_repo(char *repo_path, size_t size)
+{
+    char cwd[PATH_MAX];
+    struct stat st;
+    char *slash;
+
+    if (!getcwd(cwd, sizeof(cwd))) {
+        return false;
+    }
+    while (1) {
+        snprintf(repo_path, size, "%s/.goat", cwd);
+        if (stat(repo_path, &st) == 0 && S_ISDIR(st.st_mode)) {
+            return true;
+        }
+        slash = strrchr(cwd, '/');
+        if (!slash || cwd == slash)
+            break;
+        *slash = '\0';
+    }
+    return false;
+}
+
 int parse_add_options(int argc, char **argv, cmd_opts_t *opts)
 {
     opts->cmd_specific.add.all = false;
@@ -37,11 +113,15 @@ int parse_add_options(int argc, char **argv, cmd_opts_t *opts)
 
 int cmd_add(const cmd_opts_t *opts)
 {
-    (void)opts;
+    char repo_path[PATH_MAX];
 
-    if (!check_already_initialized()) {
+    if (!find_goat_repo(repo_path, sizeof(repo_path))) {
         MSG_NO_REPO_EXISTS;
         return 1;
+    }
+    repo_path[strlen(repo_path) - 5] = '\0';
+    if (opts->cmd_specific.add.all) {
+        list_all_files(repo_path, repo_path);
     }
     return 0;
 }
