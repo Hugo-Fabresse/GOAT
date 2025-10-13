@@ -26,6 +26,5 @@
 
 bool check_already_initialized(void);
 bool find_goat_repo(char *repo_path, size_t size);
-char *find_abs_path(const char *rel_path);
 
 #endif // REPO_H

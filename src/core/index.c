@@ -7,6 +7,7 @@
 
 #include "core/index.h"
 #include "utils/repo.h"
+#include "utils/path.h"
 #include <stdio.h>
 
 void update_index(const char *rel_path, const unsigned char *hash)
