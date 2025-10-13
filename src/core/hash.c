@@ -9,11 +9,6 @@
 #include <openssl/evp.h>
 #include <stdio.h>
 
-static FILE *open_file(const char *path)
-{
-    return fopen(path, "rb");
-}
-
 static EVP_MD_CTX *init_sha256_ctx(void)
 {
     EVP_MD_CTX *ctx = EVP_MD_CTX_new();
@@ -37,18 +32,13 @@ static int update_hash(EVP_MD_CTX *ctx, FILE *f)
     return 0;
 }
 
-static int finalize_hash(EVP_MD_CTX *ctx, unsigned char *out)
-{
-    return (EVP_DigestFinal_ex(ctx, out, NULL) == 1) ? 0 : -1;
-}
-
 int hash_file_sha256(const char *path, unsigned char *out)
 {
     FILE *f;
     EVP_MD_CTX *ctx;
     int ok = 0;
 
-    f = open_file(path);
+    f = fopen(path, "rb");
     if (!f) {
         return -1;
     }
@@ -58,7 +48,7 @@ int hash_file_sha256(const char *path, unsigned char *out)
     }
     ok = update_hash(ctx, f);
     if (ok == 0) {
-        ok = finalize_hash(ctx, out);
+        ok = (EVP_DigestFinal_ex(ctx, out, NULL) == 1) ? 0 : -1;
     }
     EVP_MD_CTX_free(ctx);
     fclose(f);
