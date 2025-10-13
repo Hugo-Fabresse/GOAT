@@ -11,7 +11,8 @@
 
 void update_index(const char *rel_path, const unsigned char *hash)
 {
-    FILE *idx = fopen(INDEX_FILE, "a");
+    char *index_path = find_abs_path(INDEX_FILE);
+    FILE *idx = fopen(index_path, "a");
 
     if (!idx) {
         fprintf(stderr, "Error: Unable to update index file %s\n", INDEX_FILE);
