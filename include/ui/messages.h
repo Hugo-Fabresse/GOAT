@@ -64,7 +64,6 @@
         COLOR_RED "Error: Failed to create file '%s'\n" \
         COLOR_YELLOW "Cause: Insufficient write permissions or missing parent directory.\n" COLOR_RESET, path \
     )
-#define MSG_UPDATE_INDEX_FAILED(path) \
-    log_msg(LOG_DEFAULT, COLOR_RED "Error: Unable to update index file %s\n" COLOR_RESET, path)
+#define MSG_UPDATE_INDEX_FAILED "Error: Unable to update index file %s\n"
 
 #endif // MESSAGES_H

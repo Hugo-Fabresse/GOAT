@@ -106,6 +106,7 @@ int cmd_add(const cmd_opts_t *opts)
     }
     repo_path[strlen(repo_path) - 5] = '\0';
     if (opts->cmd_specific.add.all) {
+        clean_index(repo_path);
         list_all_files(repo_path, repo_path);
         return 0;
     }
