@@ -10,13 +10,13 @@
 
 #include <openssl/sha.h>
 
-typedef struct index_context {
-    char ****ptable;
-    int **pnum_words;
-    int *pnum_lines;
-} index_context_t;
+typedef struct index_content {
+    const char *rel_path;
+    unsigned char hash[SHA256_DIGEST_LENGTH];
+    const char *timestamp;
+    struct index_content *next;
+} index_content_t;
 
-void update_index(const char *rel_path, const unsigned char *hash);
-void clean_index(const char *repo_root);
+void update_index(const index_content_t *content);
 
 #endif // INDEX_H

@@ -29,6 +29,7 @@ SRCS = $(SRC_DIR)/main.c \
        $(SRC_DIR)/utils/repo.c \
        $(SRC_DIR)/utils/path.c \
        $(SRC_DIR)/utils/std_ext.c \
+       $(SRC_DIR)/utils/timestamp.c \
        $(SRC_DIR)/core/command.c \
        $(SRC_DIR)/commands/init/init.c \
        $(SRC_DIR)/commands/init/init_handlers.c \
