@@ -19,6 +19,6 @@ bool fs_dir_exists(const char *path);
 bool fs_file_exists(const char *path);
 int fs_create_dir(const char *path, int mode);
 int fs_create_file(const char *path, int mode);
-char ***read_words_from_file(const char *filename, int *num_lines, int **num_words_per_line);
+int mkdir_recursive(const char *path);
 
 #endif // FS_H

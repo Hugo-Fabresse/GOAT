@@ -13,8 +13,13 @@
 
 #include "core/command.h"
 
+typedef struct add_handler {
+    bool *flag;
+    int (*func)(void);
+} add_handler_t;
+
 // Public interface
-int cmd_add(const cmd_opts_t *opts);
+int cmd_add(cmd_opts_t *opts);
 int parse_add_options(int argc, char **argv, cmd_opts_t *opts);
 
 // Command-specific option handlers

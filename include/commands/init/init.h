@@ -14,7 +14,7 @@
 #include "core/command.h"
 
 // Public interface
-int cmd_init(const cmd_opts_t *opts);
+int cmd_init(cmd_opts_t *opts);
 int parse_init_options(int argc, char **argv, cmd_opts_t *opts);
 
 // Command-specific option handlers

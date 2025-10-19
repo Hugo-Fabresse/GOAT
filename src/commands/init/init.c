@@ -81,7 +81,7 @@ int parse_init_options(int argc, char **argv, cmd_opts_t *opts)
     return parse_options(argc, argv, &init_cmd_opts, opts);
 }
 
-int cmd_init(const cmd_opts_t *opts)
+int cmd_init(cmd_opts_t *opts)
 {
     if (check_already_initialized() && !opts->cmd_specific.init.force) {
         MSG_REPO_EXISTS;

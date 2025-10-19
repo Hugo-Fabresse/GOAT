@@ -16,7 +16,7 @@
 typedef struct {
     const char *name;
     int (*parse_options)(int argc, char **argv, cmd_opts_t *opts);
-    int (*execute)(const cmd_opts_t *opts);
+    int (*execute)(cmd_opts_t *opts);
 } command_entry_t;
 
 int goat(int argc, char **argv);

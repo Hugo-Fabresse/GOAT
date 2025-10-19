@@ -23,8 +23,8 @@ SRCS = $(SRC_DIR)/main.c \
        $(SRC_DIR)/core/goat.c \
        $(SRC_DIR)/core/hash.c \
        $(SRC_DIR)/core/index.c \
+       $(SRC_DIR)/core/blob.c \
        $(SRC_DIR)/utils/fs.c \
-       $(SRC_DIR)/utils/fs_utils.c \
        $(SRC_DIR)/utils/log.c \
        $(SRC_DIR)/utils/repo.c \
        $(SRC_DIR)/utils/path.c \
