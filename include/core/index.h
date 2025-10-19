@@ -8,11 +8,12 @@
 #ifndef INDEX_H
 #define INDEX_H
 
+#include "core/hash.h"
 #include <openssl/sha.h>
 
 typedef struct index_content {
     const char *rel_path;
-    unsigned char hash[SHA256_DIGEST_LENGTH];
+    unsigned char hash[HASH_HEX_SIZE];
     const char *timestamp;
     struct index_content *next;
 } index_content_t;

@@ -54,3 +54,22 @@ int hash_file_sha256(const char *path, unsigned char *out)
     fclose(f);
     return ok;
 }
+
+void hash_to_hex(const unsigned char *hash, char *hex_output)
+{
+    for (int i = 0; i < SHA256_DIGEST_LENGTH; i++) {
+        sprintf(hex_output + (i * 2), "%02x", hash[i]);
+    }
+    hex_output[HASH_HEX_SIZE - 1] = '\0';
+}
+
+int hash_file_to_hex(const char *path, char *hex_output)
+{
+    unsigned char hash_binary[SHA256_DIGEST_LENGTH];
+
+    if (hash_file_sha256(path, hash_binary) != 0) {
+        return -1;
+    }
+    hash_to_hex(hash_binary, hex_output);
+    return 0;
+}

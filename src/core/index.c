@@ -6,6 +6,7 @@
  */
 
 #include "core/index.h"
+#include "core/hash.h"
 #include "utils/repo.h"
 #include "utils/path.h"
 #include "utils/fs.h"
@@ -33,21 +34,14 @@ static int setup_index_file_path(char *index_path, size_t path_size)
     return 0;
 }
 
-static void convert_hash_to_hex(const unsigned char *hash, char *hex_hash)
-{
-    for (int i = 0; i < SHA256_DIGEST_LENGTH; i++) {
-        sprintf(hex_hash + (i * 2), "%02x", hash[i]);
-    }
-}
-
 static void write_index_entries(FILE *index_file, const index_content_t *content)
 {
     const index_content_t *current = content;
-    char hex_hash[SHA256_DIGEST_LENGTH * 2 + 1];
+    char hex_hash[HASH_HEX_SIZE];
     char readable_time[64];
 
     while (current != NULL) {
-        convert_hash_to_hex(current->hash, hex_hash);
+        hash_to_hex(current->hash, hex_hash);
         format_timestamp(current->timestamp, readable_time, sizeof(readable_time));
         fprintf(index_file, "%s %s %s\n",
                 current->rel_path ? current->rel_path : "no_path",

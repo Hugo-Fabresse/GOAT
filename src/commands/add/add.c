@@ -49,20 +49,20 @@ static int validate_file_access(const char *path, const char *repo_root)
     return 0;
 }
 
-static int prepare_file_data(const char *path, unsigned char *hash, char *timestamp_buffer, size_t bufsize)
+static int prepare_file_data(const char *path, char *hash_hex, char *timestamp_buffer, size_t bufsize)
 {
     if (get_file_timestamp(path, timestamp_buffer, bufsize) != 0) {
         fprintf(stderr, "Timestamp error : %s\n", path);
         return -1;
     }
-    if (hash_file_sha256(path, hash) != 0) {
+    if (hash_file_to_hex(path, hash_hex) != 0) {
         fprintf(stderr, "Hash error : %s\n", path);
         return -1;
     }
     return 0;
 }
 
-static index_content_t *create_index_node(const char *rel_path, const unsigned char *hash, const char *timestamp)
+static index_content_t *create_index_node(const char *rel_path, const char *hash_hex, const char *timestamp)
 {
     index_content_t *new_node = malloc(sizeof(index_content_t));
 
@@ -71,7 +71,9 @@ static index_content_t *create_index_node(const char *rel_path, const unsigned c
         return NULL;
     }
     new_node->rel_path = strdup(rel_path);
-    memcpy(new_node->hash, hash, SHA256_DIGEST_LENGTH);
+    for (int i = 0; i < SHA256_DIGEST_LENGTH; i++) {
+        sscanf(hash_hex + (i * 2), "%2hhx", &new_node->hash[i]);
+    }
     new_node->timestamp = strdup(timestamp);
     new_node->next = NULL;
     return new_node;
@@ -79,18 +81,18 @@ static index_content_t *create_index_node(const char *rel_path, const unsigned c
 
 static void process_file(const char *path, const char *repo_root, index_content_t **content_list)
 {
-    unsigned char hash[SHA256_DIGEST_LENGTH];
+    char hash_hex[HASH_HEX_SIZE];
     char timestamp_buffer[32];
     const char *rel_path;
     index_content_t *new_node;
 
     if (validate_file_access(path, repo_root) != 0)
         return;
-    if (prepare_file_data(path, hash, timestamp_buffer, sizeof(timestamp_buffer)) != 0)
+    if (prepare_file_data(path, hash_hex, timestamp_buffer, sizeof(timestamp_buffer)) != 0)
         return;
     rel_path = path + strlen(repo_root) + 1;
     printf("Staged: %s\n", rel_path);
-    new_node = create_index_node(rel_path, hash, timestamp_buffer);
+    new_node = create_index_node(rel_path, hash_hex, timestamp_buffer);
     if (!new_node)
         return;
     new_node->next = *content_list;
