@@ -110,7 +110,7 @@ static int validate_file_access(const char *path, const char *repo_root)
     return 0;
 }
 
-static void process_file(const char *path, const char *repo_root, index_content_t **content_list, const index_content_t *current_index)
+void process_file(const char *path, const char *repo_root, index_content_t **content_list, const index_content_t *current_index)
 {
     char hash_hex[HASH_HEX_SIZE], timestamp[32];
     const char *rel_path = path + strlen(repo_root) + 1;
@@ -134,29 +134,6 @@ static void process_file(const char *path, const char *repo_root, index_content_
     printf("Staged: %s\n", rel_path);
 }
 
-void list_all_files(const char *dir, const char *repo_root, index_content_t **content_list, const index_content_t *current_index)
-{
-    DIR *d = opendir(dir);
-    struct dirent *entry;
-    char path[PATH_MAX];
-    struct stat st;
-
-    if (!d)
-        return;
-    while ((entry = readdir(d))) {
-        if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0 || strcmp(entry->d_name, ".goat") == 0)
-            continue;
-        snprintf(path, sizeof(path), "%s/%s", dir, entry->d_name);
-        if (stat(path, &st) == -1)
-            continue;
-        if (S_ISDIR(st.st_mode))
-            list_all_files(path, repo_root, content_list, current_index);
-        else if (S_ISREG(st.st_mode))
-            process_file(path, repo_root, content_list, current_index);
-    }
-    closedir(d);
-}
-
 int parse_add_options(int argc, char **argv, cmd_opts_t *opts)
 {
     opts->cmd_specific.add.all = false;
@@ -164,42 +141,13 @@ int parse_add_options(int argc, char **argv, cmd_opts_t *opts)
     return parse_options(argc, argv, &add_cmd_opts, opts);
 }
 
-static int add_all_files_wrapper(void)
-{
-    char repo_path[PATH_MAX];
-    index_content_t *content = NULL;
-    index_content_t *current_index = NULL;
-
-    if (!find_goat_repo(repo_path, sizeof(repo_path))) {
-        fprintf(stderr, "No repository found.\n");
-        return 1;
-    }
-    repo_path[strlen(repo_path)-5] = '\0';
-    current_index = read_current_index();
-    list_all_files(repo_path, repo_path, &content, current_index);
-    update_index(content);
-    free_index_content(current_index);
-    free_index_content(content);
-    return 0;
-}
-
-// Table of function pointers for add options
-const add_handler_t add_handlers[] = {
-        { NULL, add_all_files_wrapper }
-};
-
-static void set_handlers_flags(add_handler_t *handlers, cmd_opts_t *opts)
-{
-    handlers[0].flag = &opts->cmd_specific.add.all;
-}
-
 int cmd_add(cmd_opts_t *opts)
 {
-    add_handler_t handlers[sizeof(add_handlers)/sizeof(add_handlers[0])];
+    add_handler_t handlers[ADD_HANDLERS_COUNT];
 
     memcpy(handlers, add_handlers, sizeof(handlers));
     set_handlers_flags(handlers, opts);
-    for (size_t i = 0; i < sizeof(handlers)/sizeof(handlers[0]); i++) {
+    for (size_t i = 0; i < ADD_HANDLERS_COUNT; i++) {
         if (*(handlers[i].flag))
             return handlers[i].func();
     }

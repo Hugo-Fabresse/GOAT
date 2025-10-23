@@ -34,7 +34,10 @@ SRCS = $(SRC_DIR)/main.c \
        $(SRC_DIR)/commands/init/init.c \
        $(SRC_DIR)/commands/init/init_handlers.c \
        $(SRC_DIR)/commands/add/add.c \
-       $(SRC_DIR)/commands/add/add_internal.c
+       $(SRC_DIR)/commands/add/add_all.c \
+       $(SRC_DIR)/commands/add/add_update.c \
+       $(SRC_DIR)/commands/add/add_internal.c \
+       $(SRC_DIR)/commands/add/add_handlers.c
 
 # Object files
 OBJS = $(SRCS:.c=.o)

@@ -19,3 +19,9 @@ void set_update(cmd_opts_t *opts)
 {
     opts->cmd_specific.add.update = true;
 }
+
+void set_handlers_flags(add_handler_t *handlers, cmd_opts_t *opts)
+{
+    handlers[0].flag = &opts->cmd_specific.add.all;
+    handlers[1].flag = &opts->cmd_specific.add.update;
+}
