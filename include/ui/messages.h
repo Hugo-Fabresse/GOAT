@@ -49,6 +49,16 @@
         COLOR_RED "Error: No GOAT repository found in the current directory.\n" \
         COLOR_YELLOW "Hint: Run 'goat init' first to initialize a repository.\n" COLOR_RESET \
     )
+#define MSG_NO_REPO_FOUND \
+    log_msg(LOG_ERROR, "No repository found.\n")
+#define MSG_FILE_ACCESS_ERROR(file) \
+    log_msg(LOG_ERROR, "Unable to read: %s\n", file)
+#define MSG_FILE_STAGED(file) \
+    log_msg(LOG_DEFAULT, COLOR_GREEN "Staged: %s\n" COLOR_RESET, file)
+#define MSG_FILE_SKIPPED_PATH_TOO_LONG(repo, file) \
+    log_msg(LOG_ERROR, "Skipped (path too long): %s/%s\n", repo, file)
+#define MSG_FILE_SKIPPED_NOT_FOUND(file) \
+    log_msg(LOG_DEFAULT, COLOR_YELLOW "Skipped (not found): %s\n" COLOR_RESET, file)
 
 // ===== Filesystem Error Messages =====
 #define MSG_CREATE_DIR_FAILED(path) \

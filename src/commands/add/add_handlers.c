@@ -12,6 +12,7 @@
 #include "commands/add/add.h"
 #include "core/index.h"
 #include "utils/repo.h"
+#include "ui/messages.h"
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
@@ -24,7 +25,7 @@ int update_tracked_files_wrapper(void)
     index_content_t *current_index = NULL;
 
     if (!find_goat_repo(repo_path, sizeof(repo_path))) {
-        fprintf(stderr, "No repository found.\n");
+        MSG_NO_REPO_FOUND;
         return 1;
     }
     repo_path[strlen(repo_path)-5] = '\0';
@@ -43,7 +44,7 @@ int add_all_files_wrapper(void)
     index_content_t *current_index = NULL;
 
     if (!find_goat_repo(repo_path, sizeof(repo_path))) {
-        fprintf(stderr, "No repository found.\n");
+        MSG_NO_REPO_FOUND;
         return 1;
     }
     repo_path[strlen(repo_path)-5] = '\0';

@@ -41,12 +41,12 @@ static const command_options_t add_cmd_opts = {
 
 static void fill_metadata(index_content_t *metadata, const struct stat *st)
 {
-    metadata->mode   = st->st_mode;
-    metadata->size   = st->st_size;
-    metadata->mtime  = st->st_mtime;
-    metadata->ctime  = st->st_ctime;
+    metadata->mode = st->st_mode;
+    metadata->size = st->st_size;
+    metadata->mtime = st->st_mtime;
+    metadata->ctime = st->st_ctime;
     metadata->device = st->st_dev;
-    metadata->inode  = st->st_ino;
+    metadata->inode = st->st_ino;
 }
 
 static int prepare_file(index_content_t *metadata, const char *path, char *hash_hex, char *timestamp)
@@ -104,7 +104,7 @@ static index_content_t *create_index_node(const char *rel_path, const char *hash
 static int validate_file_access(const char *path, const char *repo_root)
 {
     if (access(path, R_OK) != 0) {
-        fprintf(stderr, "Unable to read: %s\n", path + strlen(repo_root) + 1);
+        MSG_FILE_ACCESS_ERROR(path + strlen(repo_root) + 1);
         return -1;
     }
     return 0;
@@ -131,7 +131,7 @@ void process_file(const char *path, const char *repo_root, index_content_t **con
         return;
     node->next = *content_list;
     *content_list = node;
-    printf("Staged: %s\n", rel_path);
+    MSG_FILE_STAGED(rel_path);
 }
 
 int parse_add_options(int argc, char **argv, cmd_opts_t *opts)

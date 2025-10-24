@@ -1,6 +1,9 @@
 /*
  * File: add_all.c
- * Description: ${DESCRIPTION}
+ * Description: Implementation of recursive file listing for the 'add --all' command in GOAT.
+ *              Provides functionality to recursively traverse directories and process all
+ *              regular files for staging, excluding the .goat directory and special entries.
+ *              Used to stage all modified files in the repository working directory.
  * Date: 23/10/2025
  * Author: Aliago
  */
