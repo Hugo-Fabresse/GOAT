@@ -55,16 +55,44 @@ TEST_BIN = $(BUILD_DIR)/test_init
 TEST_OBJS = $(BUILD_DIR)/utils/fs.o \
             $(BUILD_DIR)/utils/log.o \
             $(BUILD_DIR)/utils/repo.o \
+            $(BUILD_DIR)/utils/timestamp.o \
+            $(BUILD_DIR)/utils/path.o \
+            $(BUILD_DIR)/utils/std_ext.o \
             $(BUILD_DIR)/core/command.o \
+            $(BUILD_DIR)/core/hash.o \
+            $(BUILD_DIR)/core/index.o \
+            $(BUILD_DIR)/core/blob.o \
             $(BUILD_DIR)/commands/init/init.o \
             $(BUILD_DIR)/commands/init/init_handlers.o \
             $(BUILD_DIR)/commands/add/add.o \
+            $(BUILD_DIR)/commands/add/add_all.o \
+            $(BUILD_DIR)/commands/add/add_update.o \
+            $(BUILD_DIR)/commands/add/add_internal.o \
             $(BUILD_DIR)/commands/add/add_handlers.o
+
+# Test-specific objects with coverage flags
+TEST_COV_OBJS = $(BUILD_DIR)/test_utils/fs.o \
+                $(BUILD_DIR)/test_utils/log.o \
+                $(BUILD_DIR)/test_utils/repo.o \
+                $(BUILD_DIR)/test_utils/timestamp.o \
+                $(BUILD_DIR)/test_utils/path.o \
+                $(BUILD_DIR)/test_utils/std_ext.o \
+                $(BUILD_DIR)/test_core/command.o \
+                $(BUILD_DIR)/test_core/hash.o \
+                $(BUILD_DIR)/test_core/index.o \
+                $(BUILD_DIR)/test_core/blob.o \
+                $(BUILD_DIR)/test_commands/init/init.o \
+                $(BUILD_DIR)/test_commands/init/init_handlers.o \
+                $(BUILD_DIR)/test_commands/add/add.o \
+                $(BUILD_DIR)/test_commands/add/add_all.o \
+                $(BUILD_DIR)/test_commands/add/add_update.o \
+                $(BUILD_DIR)/test_commands/add/add_internal.o \
+                $(BUILD_DIR)/test_commands/add/add_handlers.o
 
 tests: $(TEST_BIN)
 
-$(TEST_BIN): $(TEST_OBJ) $(TEST_OBJS)
-	$(CC) $(CFLAGS) $(COVFLAGS) $^ -o $@ -lcriterion
+$(TEST_BIN): $(TEST_OBJ) $(TEST_COV_OBJS)
+	$(CC) $(CFLAGS) $(COVFLAGS) $^ -o $@ -lcriterion -lssl -lcrypto
 
 $(TEST_OBJ): $(TEST_SRC) $(BUILD_DIR)
 	$(CC) $(CFLAGS) $(COVFLAGS) -Itest -c $< -o $@
@@ -75,6 +103,8 @@ $(TEST_OBJ): $(TEST_SRC) $(BUILD_DIR)
 coverage: tests
 	./$(TEST_BIN)
 	lcov --directory . --capture --output-file coverage.info --ignore-errors mismatch
+	lcov --remove coverage.info '*/test/*' --output-file coverage.info
+	lcov --extract coverage.info '*/src/*' --output-file coverage.info
 	genhtml coverage.info --output-directory coverage
 	@echo "Open coverage/index.html in your browser to see the report"
 
@@ -93,6 +123,11 @@ $(BUILD_DIR)/%.o: $(SRC_DIR)/%.c
 $(BUILD_DIR)/%.o: test/%.c
 	@mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) -c $< -o $@
+
+# Compile source files with coverage flags for testing
+$(BUILD_DIR)/test_%.o: $(SRC_DIR)/%.c
+	@mkdir -p $(dir $@)
+	$(CC) $(CFLAGS) $(COVFLAGS) -c $< -o $@
 
 # -------------------------------
 # Build directory

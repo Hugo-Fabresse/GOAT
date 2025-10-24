@@ -70,8 +70,8 @@ Test(init_parse, force_and_quiet) {
     char *argv[] = {"goat", "init", "--force", "--quiet"};
     int ret = parse_init_options(4, argv, &opts);
     cr_assert_eq(ret, 0);
-    cr_assert(opts.force);
-    cr_assert(opts.quiet);
+    cr_assert(opts.cmd_specific.init.force);
+    cr_assert(opts.cmd_specific.init.quiet);
 }
 
 Test(init_parse, quiet_then_force) {
@@ -79,8 +79,8 @@ Test(init_parse, quiet_then_force) {
     char *argv[] = {"goat", "init", "--quiet", "--force"};
     int ret = parse_init_options(4, argv, &opts);
     cr_assert_eq(ret, 0);
-    cr_assert(opts.force);
-    cr_assert(opts.quiet);
+    cr_assert(opts.cmd_specific.init.force);
+    cr_assert(opts.cmd_specific.init.quiet);
 }
 
 Test(init_parse, invalid_option_fails) {
@@ -95,8 +95,8 @@ Test(init_parse, duplicated_options) {
     char *argv[] = {"goat", "init", "--force", "--force", "--quiet"};
     int ret = parse_init_options(5, argv, &opts);
     cr_assert_eq(ret, 0);
-    cr_assert(opts.force);
-    cr_assert(opts.quiet);
+    cr_assert(opts.cmd_specific.init.force);
+    cr_assert(opts.cmd_specific.init.quiet);
 }
 
 Test(init_parse, mixed_valid_and_invalid) {
@@ -109,22 +109,22 @@ Test(init_parse, mixed_valid_and_invalid) {
 // --- Option Handler Tests ---
 
 Test(init_handler, set_force_sets_flag) {
-    cmd_opts_t opts = {.force = false};
+    cmd_opts_t opts = {.cmd_specific.init.force = false};
     set_force(&opts);
-    cr_assert(opts.force);
+    cr_assert(opts.cmd_specific.init.force);
 }
 
 Test(init_handler, set_quiet_sets_flag) {
-    cmd_opts_t opts = {.quiet = false};
+    cmd_opts_t opts = {.cmd_specific.init.quiet = false};
     set_quiet(&opts);
-    cr_assert(opts.quiet);
+    cr_assert(opts.cmd_specific.init.quiet);
 }
 
 // --- Repository Initialization Tests ---
 
 Test(init_cmd, creates_repository) {
     remove_goat_dir();
-    cmd_opts_t opts = {.force = true}; // Forcing to avoid existing repo issues
+    cmd_opts_t opts = {.cmd_specific.init.force = true}; // Forcing to avoid existing repo issues
     int ret = cmd_init(&opts);
     cr_assert_eq(ret, 0);
     cr_assert(path_exists(GOAT_DIR));
@@ -133,7 +133,7 @@ Test(init_cmd, creates_repository) {
 
 Test(init_cmd, quiet_mode_suppresses_output) {
     remove_goat_dir();
-    cmd_opts_t opts = {.force = true, .quiet = true};
+    cmd_opts_t opts = {.cmd_specific.init.force = true, .cmd_specific.init.quiet = true};
 
     FILE *original_stdout = stdout;
     FILE *null_out = fopen("/dev/null", "w");
@@ -155,7 +155,7 @@ Test(init_cmd, quiet_mode_suppresses_output) {
 Test(init_cmd, force_overwrites_existing_repo) {
     remove_goat_dir();
     mkdir(GOAT_DIR, 0755);
-    cmd_opts_t opts = {.force = true};
+    cmd_opts_t opts = {.cmd_specific.init.force = true};
     int ret = cmd_init(&opts);
     cr_assert_eq(ret, 0);
     cr_assert(path_exists(GOAT_DIR));
@@ -164,9 +164,9 @@ Test(init_cmd, force_overwrites_existing_repo) {
 
 Test(init_cmd, idempotent_fails_second_time) {
     remove_goat_dir();
-    cmd_opts_t opts = {.force = true}; // Force creation first
+    cmd_opts_t opts = {.cmd_specific.init.force = true}; // Force creation first
     int r1 = cmd_init(&opts);
-    opts.force = false; // Second attempt without force
+    opts.cmd_specific.init.force = false; // Second attempt without force
     int r2 = cmd_init(&opts);
     cr_assert_eq(r1, 0);
     cr_assert_eq(r2, 1);
@@ -177,7 +177,7 @@ Test(init_cmd, idempotent_fails_second_time) {
 
 Test(init_cmd, creates_complete_structure) {
     remove_goat_dir();
-    cmd_opts_t opts = {.force = true};
+    cmd_opts_t opts = {.cmd_specific.init.force = true};
     int ret = cmd_init(&opts);
     cr_assert_eq(ret, 0);
 
