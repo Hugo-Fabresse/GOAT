@@ -101,37 +101,102 @@ static index_content_t *create_index_node(const char *rel_path, const char *hash
     return node;
 }
 
-static int validate_file_access(const char *path, const char *repo_root)
+void init_add_stats(add_stats_t *stats)
+{
+    stats->added = 0;
+    stats->modified = 0;
+    stats->errors = 0;
+}
+
+void display_add_summary(const add_stats_t *stats, bool show_added)
+{
+    if (show_added && stats->added > 0) {
+        MSG_ADD_SUMMARY_WITH_ADDED(stats->added, stats->modified);
+    } else {
+        MSG_ADD_SUMMARY_SIMPLE(stats->modified);
+    }
+    if (stats->errors > 0) {
+        MSG_ADD_ERRORS(stats->errors);
+    }
+}
+
+void init_add_context(add_context_t *ctx, add_stats_t *stats, const index_content_t *index)
+{
+    ctx->stats = stats;
+    ctx->current_index = index;
+}
+
+void set_context_paths(add_context_t *ctx, const char *repo_root, index_content_t **content)
+{
+    ctx->repo_root = repo_root;
+    ctx->content_list = content;
+}
+
+static int validate_file_access(const char *path, add_context_t *ctx)
 {
     if (access(path, R_OK) != 0) {
-        MSG_FILE_ACCESS_ERROR(path + strlen(repo_root) + 1);
+        MSG_FILE_ACCESS_ERROR(path + strlen(ctx->repo_root) + 1);
+        ctx->stats->errors++;
         return -1;
     }
     return 0;
 }
 
-void process_file(const char *path, const char *repo_root, index_content_t **content_list, const index_content_t *current_index)
+static void prepare_metadata_from_cache(index_content_t *metadata, char *timestamp, const index_content_t *cached)
+{
+    memcpy(metadata->hash, cached->hash, SHA256_DIGEST_LENGTH);
+    strncpy(timestamp, cached->timestamp, sizeof(timestamp)-1);
+    timestamp[sizeof(timestamp)-1] = '\0';
+}
+
+static int add_node_to_list(const file_data_t *file_data, add_context_t *ctx)
+{
+    index_content_t *node = create_index_node(file_data->rel_path, file_data->hash_hex, file_data->timestamp, file_data->metadata);
+
+    if (!node) {
+        ctx->stats->errors++;
+        return -1;
+    }
+    node->next = *(ctx->content_list);
+    *(ctx->content_list) = node;
+    return 0;
+}
+
+static void update_file_stats(const char *rel_path, bool is_new_file, add_context_t *ctx)
+{
+    if (is_new_file) {
+        MSG_FILE_ADDED(rel_path);
+        ctx->stats->added++;
+    } else {
+        MSG_FILE_MODIFIED(rel_path);
+        ctx->stats->modified++;
+    }
+}
+
+void process_file(const char *path, add_context_t *ctx)
 {
     char hash_hex[HASH_HEX_SIZE], timestamp[32];
-    const char *rel_path = path + strlen(repo_root) + 1;
+    const char *rel_path = path + strlen(ctx->repo_root) + 1;
     index_content_t metadata = {0};
-    index_content_t *node;
-    index_content_t *cached = find_index_entry(current_index, rel_path);
+    index_content_t *cached = find_index_entry(ctx->current_index, rel_path);
+    bool is_new_file = (cached == NULL);
+    file_data_t file_data;
 
-    if (validate_file_access(path, repo_root) != 0)
+    if (validate_file_access(path, ctx) != 0)
         return;
     if (cached && !file_changed(path, cached)) {
-        memcpy(metadata.hash, cached->hash, SHA256_DIGEST_LENGTH);
-        strncpy(timestamp, cached->timestamp, sizeof(timestamp)-1);
-        timestamp[sizeof(timestamp)-1] = '\0';
-    } else if (prepare_file(&metadata, path, hash_hex, timestamp) != 0)
+        prepare_metadata_from_cache(&metadata, timestamp, cached);
+    } else if (prepare_file(&metadata, path, hash_hex, timestamp) != 0) {
+        ctx->stats->errors++;
         return;
-    node = create_index_node(rel_path, hash_hex, timestamp, &metadata);
-    if (!node)
+    }
+    file_data.rel_path = rel_path;
+    file_data.hash_hex = hash_hex;
+    file_data.timestamp = timestamp;
+    file_data.metadata = &metadata;
+    if (add_node_to_list(&file_data, ctx) != 0)
         return;
-    node->next = *content_list;
-    *content_list = node;
-    MSG_FILE_STAGED(rel_path);
+    update_file_stats(rel_path, is_new_file, ctx);
 }
 
 int parse_add_options(int argc, char **argv, cmd_opts_t *opts)

@@ -26,7 +26,7 @@
 
 // ===== Init Command Messages =====
 #define MSG_UNKNOWN_OPTION(opt) \
-    log_msg(LOG_DEFAULT, COLOR_RED "error: unknown option '%s'\n" COLOR_RESET, opt);
+    log_msg(LOG_DEFAULT, COLOR_RED "Error: Unknown option '%s'\n" COLOR_RESET, opt);
 #define MSG_REPO_EXISTS \
     log_msg( \
         LOG_DEFAULT, \
@@ -51,14 +51,32 @@
     )
 #define MSG_NO_REPO_FOUND \
     log_msg(LOG_ERROR, "No repository found.\n")
+
+// Add operation headers
+#define MSG_ADD_ALL_HEADER \
+    log_msg(LOG_DEFAULT, COLOR_BLUE "Adding all files to staging area...\n" COLOR_RESET)
+#define MSG_ADD_UPDATE_HEADER \
+    log_msg(LOG_DEFAULT, COLOR_BLUE "Updating tracked files...\n" COLOR_RESET)
+
+// File status messages
+#define MSG_FILE_ADDED(file) \
+    log_msg(LOG_DEFAULT, COLOR_GREEN "add" COLOR_RESET " '%s'\n", file)
+#define MSG_FILE_MODIFIED(file) \
+    log_msg(LOG_DEFAULT, COLOR_YELLOW "modify" COLOR_RESET " '%s'\n", file)
 #define MSG_FILE_ACCESS_ERROR(file) \
-    log_msg(LOG_ERROR, "Unable to read: %s\n", file)
-#define MSG_FILE_STAGED(file) \
-    log_msg(LOG_DEFAULT, COLOR_GREEN "Staged: %s\n" COLOR_RESET, file)
+    log_msg(LOG_DEFAULT, COLOR_RED "Error: Unable to read '%s'\n" COLOR_RESET, file)
 #define MSG_FILE_SKIPPED_PATH_TOO_LONG(repo, file) \
-    log_msg(LOG_ERROR, "Skipped (path too long): %s/%s\n", repo, file)
+    log_msg(LOG_DEFAULT, COLOR_RED "Error: path too long: %s/%s\n" COLOR_RESET, repo, file)
 #define MSG_FILE_SKIPPED_NOT_FOUND(file) \
     log_msg(LOG_DEFAULT, COLOR_YELLOW "Skipped (not found): %s\n" COLOR_RESET, file)
+
+// Summary messages
+#define MSG_ADD_SUMMARY_SIMPLE(modified) \
+    log_msg(LOG_DEFAULT, COLOR_GREEN "\nSummary: %d file(s) modified\n" COLOR_RESET, modified)
+#define MSG_ADD_SUMMARY_WITH_ADDED(added, modified) \
+    log_msg(LOG_DEFAULT, COLOR_GREEN "\nSummary: %d file(s) added, %d file(s) modified\n" COLOR_RESET, added, modified)
+#define MSG_ADD_ERRORS(errors) \
+    log_msg(LOG_DEFAULT, COLOR_RED "Errors: %d file(s) could not be processed\n" COLOR_RESET, errors)
 
 // ===== Filesystem Error Messages =====
 #define MSG_CREATE_DIR_FAILED(path) \

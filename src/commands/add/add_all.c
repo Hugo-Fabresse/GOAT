@@ -14,7 +14,7 @@
 #include <string.h>
 #include <dirent.h>
 
-void list_all_files(const char *dir, const char *repo_root, index_content_t **content_list, const index_content_t *current_index)
+void list_all_files(const char *dir, add_context_t *ctx)
 {
     DIR *d = opendir(dir);
     struct dirent *entry;
@@ -30,9 +30,9 @@ void list_all_files(const char *dir, const char *repo_root, index_content_t **co
         if (stat(path, &st) == -1)
             continue;
         if (S_ISDIR(st.st_mode))
-            list_all_files(path, repo_root, content_list, current_index);
+            list_all_files(path, ctx);
         else if (S_ISREG(st.st_mode))
-            process_file(path, repo_root, content_list, current_index);
+            process_file(path, ctx);
     }
     closedir(d);
 }
