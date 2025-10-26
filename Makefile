@@ -48,9 +48,9 @@ all: $(BUILD_DIR) $(TARGET)
 # -------------------------------
 # Unit tests
 # -------------------------------
-TEST_SRC = test/test_init.c
-TEST_OBJ = $(BUILD_DIR)/test_init.o
-TEST_BIN = $(BUILD_DIR)/test_init
+TEST_SRCS = test/test_init.c test/test_add.c
+TEST_OBJS_TARGETS = $(BUILD_DIR)/test_init.o $(BUILD_DIR)/test_add.o
+TEST_BINS = $(BUILD_DIR)/test_init $(BUILD_DIR)/test_add
 
 TEST_OBJS = $(BUILD_DIR)/utils/fs.o \
             $(BUILD_DIR)/utils/log.o \
@@ -89,19 +89,26 @@ TEST_COV_OBJS = $(BUILD_DIR)/test_utils/fs.o \
                 $(BUILD_DIR)/test_commands/add/add_internal.o \
                 $(BUILD_DIR)/test_commands/add/add_handlers.o
 
-tests: $(TEST_BIN)
+tests: $(TEST_BINS)
 
-$(TEST_BIN): $(TEST_OBJ) $(TEST_COV_OBJS)
+$(BUILD_DIR)/test_init: $(BUILD_DIR)/test_init.o $(TEST_COV_OBJS)
 	$(CC) $(CFLAGS) $(COVFLAGS) $^ -o $@ -lcriterion -lssl -lcrypto
 
-$(TEST_OBJ): $(TEST_SRC) $(BUILD_DIR)
+$(BUILD_DIR)/test_add: $(BUILD_DIR)/test_add.o $(TEST_COV_OBJS)
+	$(CC) $(CFLAGS) $(COVFLAGS) $^ -o $@ -lcriterion -lssl -lcrypto
+
+$(BUILD_DIR)/test_init.o: test/test_init.c $(BUILD_DIR)
+	$(CC) $(CFLAGS) $(COVFLAGS) -Itest -c $< -o $@
+
+$(BUILD_DIR)/test_add.o: test/test_add.c $(BUILD_DIR)
 	$(CC) $(CFLAGS) $(COVFLAGS) -Itest -c $< -o $@
 
 # -------------------------------
 # Coverage
 # -------------------------------
 coverage: tests
-	./$(TEST_BIN)
+	-./$(BUILD_DIR)/test_init
+	-./$(BUILD_DIR)/test_add
 	lcov --directory . --capture --output-file coverage.info --ignore-errors mismatch
 	lcov --remove coverage.info '*/test/*' --output-file coverage.info
 	lcov --extract coverage.info '*/src/*' --output-file coverage.info
@@ -139,7 +146,7 @@ $(BUILD_DIR):
 # Clean
 # -------------------------------
 clean:
-	rm -f $(OBJS) $(TARGET) $(TEST_OBJ) $(TEST_BIN) *.gcda *.gcno *.info
+	rm -f $(OBJS) $(TARGET) $(TEST_OBJS_TARGETS) $(TEST_BINS) *.gcda *.gcno *.info
 
 distclean: clean
 	rm -rf $(BUILD_DIR) coverage

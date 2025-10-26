@@ -191,3 +191,57 @@ Test(init_cmd, creates_complete_structure) {
 
     remove_goat_dir();
 }
+
+// --- Error handling tests ---
+
+Test(init_cmd, creation_failure_returns_error) {
+    remove_goat_dir();
+    // Create a file with the same name as the directory we want to create
+    FILE *f = fopen(GOAT_DIR, "w");
+    if (f) {
+        fprintf(f, "blocking file");
+        fclose(f);
+    }
+
+    cmd_opts_t opts = {.cmd_specific.init.force = true};
+
+    // Redirect stderr to avoid error output during test
+    FILE *original_stderr = stderr;
+    FILE *null_err = fopen("/dev/null", "w");
+    if (null_err) stderr = null_err;
+
+    int ret = cmd_init(&opts);
+
+    if (null_err) {
+        fclose(null_err);
+        stderr = original_stderr;
+    }
+
+    cr_assert_eq(ret, 2); // Should return 2 for creation failure
+
+    // Cleanup
+    unlink(GOAT_DIR);
+    remove_goat_dir();
+}
+
+Test(init_cmd, quiet_mode_no_success_message) {
+    remove_goat_dir();
+    cmd_opts_t opts = {.cmd_specific.init.force = true, .cmd_specific.init.quiet = true};
+
+    // Capture stdout to verify no success message
+    FILE *original_stdout = stdout;
+    FILE *null_out = fopen("/dev/null", "w");
+    if (null_out) stdout = null_out;
+
+    int ret = cmd_init(&opts);
+
+    if (null_out) {
+        fclose(null_out);
+        stdout = original_stdout;
+    }
+
+    cr_assert_eq(ret, 0);
+    cr_assert(path_exists(GOAT_DIR));
+    remove_goat_dir();
+}
+
