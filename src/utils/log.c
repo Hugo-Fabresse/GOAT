@@ -6,6 +6,7 @@
  */
 
 #include "utils/log.h"
+#include "ui/messages.h"
 #include <stdio.h>
 #include <stdarg.h>
 
@@ -26,7 +27,7 @@ void log_msg(log_level_t level, const char *fmt, ...)
             break;
         case LOG_ERROR:
             out = stderr;
-            fprintf(out, "[ERROR] ");
+            fprintf(out, COLOR_RED "[ERROR] " COLOR_RESET);
             vfprintf(out, fmt, args);
             break;
         default:

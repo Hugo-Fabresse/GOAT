@@ -19,5 +19,6 @@ bool fs_dir_exists(const char *path);
 bool fs_file_exists(const char *path);
 int fs_create_dir(const char *path, int mode);
 int fs_create_file(const char *path, int mode);
+int mkdir_recursive(const char *path);
 
 #endif // FS_H

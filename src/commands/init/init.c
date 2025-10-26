@@ -1,29 +1,21 @@
 /*
  * File: init.c
- * Description: Implementation of the 'init' command for GOAT.
- *              Provides the entry point to initialize a new GOAT repository.
- *              Creates the repository structure including .goat/, objects/, refs/heads/,
- *              HEAD, config, and index, with proper error handling.
- *              Supports command options such as 'force' and 'quiet'.
+ * Description: Core implementation of the 'init' command in GOAT.
+ *              Initializes a new repository by creating the .goat/ structure
+ *              with all required subdirectories and files.
+ *              Supports '--force' for reinitialization and '--quiet' for silent mode.
  * Date: 08/10/2025
  * Author: Aliago
  */
 
 #include "commands/init/init.h"
+#include "core/command.h"
 #include "utils/fs.h"
+#include "utils/repo.h"
 #include "ui/messages.h"
 #include <stdio.h>
 #include <stdbool.h>
 #include <string.h>
-
-// Repository structure constants
-#define GOAT_DIR       ".goat"
-#define OBJECTS_DIR    ".goat/objects"
-#define REFS_DIR       ".goat/refs"
-#define HEADS_DIR      ".goat/refs/heads"
-#define HEAD_FILE      ".goat/HEAD"
-#define CONFIG_FILE    ".goat/config"
-#define INDEX_FILE     ".goat/index"
 
 // Paths to create with their modes and types
 static const struct path_mode {
@@ -40,16 +32,18 @@ static const struct path_mode {
         {INDEX_FILE,  0644, false}
 };
 
-// Option mapping array
-static const option_entry_t option_map[] = {
-        {"--force", set_force},
-        {"--quiet", set_quiet}
+// Option definitions for init command
+static const option_entry_t init_options[] = {
+    {"--force", "Reinitialize and overwrite an existing repository", set_force},
+    {"--quiet", "Suppress output messages", set_quiet}
 };
 
-static bool check_already_initialized(void)
-{
-    return fs_dir_exists(GOAT_DIR);
-}
+// Command options structure
+static const command_options_t init_cmd_opts = {
+    .command_name = "init",
+    .options = init_options,
+    .num_options = sizeof(init_options)/sizeof(init_options[0])
+};
 
 static int create_path(const struct path_mode *p)
 {
@@ -80,36 +74,16 @@ static int create_structure(void)
     return 0;
 }
 
-static int handle_option(const char *arg, cmd_opts_t *opts)
-{
-    size_t option_count = sizeof(option_map)/sizeof(option_map[0]);
-
-    for (size_t j = 0; j < option_count; j++) {
-        if (strcmp(arg, option_map[j].name) == 0) {
-            option_map[j].set_option(opts);
-            return 0;
-        }
-    }
-    MSG_UNKNOWN_OPTION(arg);
-    return -1;
-}
-
 int parse_init_options(int argc, char **argv, cmd_opts_t *opts)
 {
-    opts->force = false;
-    opts->quiet = false;
-
-    for (int i = 2; i < argc; i++) {
-        if (handle_option(argv[i], opts) < 0) {
-            return -1;
-        }
-    }
-    return 0;
+    opts->cmd_specific.init.force = false;
+    opts->cmd_specific.init.quiet = false;
+    return parse_options(argc, argv, &init_cmd_opts, opts);
 }
 
-int cmd_init(const cmd_opts_t *opts)
+int cmd_init(cmd_opts_t *opts)
 {
-    if (check_already_initialized() && !opts->force) {
+    if (check_already_initialized() && !opts->cmd_specific.init.force) {
         MSG_REPO_EXISTS;
         return 1;
     }
@@ -117,7 +91,7 @@ int cmd_init(const cmd_opts_t *opts)
         MSG_INIT_FAILURE;
         return 2;
     }
-    if (!opts->quiet) {
+    if (!opts->cmd_specific.init.quiet) {
         MSG_INIT_SUCCESS;
     }
     return 0;

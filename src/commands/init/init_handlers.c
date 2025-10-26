@@ -12,10 +12,10 @@
 
 void set_force(cmd_opts_t *opts)
 {
-    opts->force = true;
+    opts->cmd_specific.init.force = true;
 }
 
 void set_quiet(cmd_opts_t *opts)
 {
-    opts->quiet = true;
+    opts->cmd_specific.init.quiet = true;
 }
