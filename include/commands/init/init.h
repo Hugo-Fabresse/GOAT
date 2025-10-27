@@ -18,7 +18,8 @@ int cmd_init(cmd_opts_t *opts);
 int parse_init_options(int argc, char **argv, cmd_opts_t *opts);
 
 // Command-specific option handlers
-void set_force(cmd_opts_t *opts);
-void set_quiet(cmd_opts_t *opts);
+void set_init_force(cmd_opts_t *opts);
+void set_init_quiet(cmd_opts_t *opts);
+void set_init_help(cmd_opts_t *opts);
 
 #endif // INIT_H

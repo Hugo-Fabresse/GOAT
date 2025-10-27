@@ -27,6 +27,12 @@
 // ===== Init Command Messages =====
 #define MSG_UNKNOWN_OPTION(opt) \
     log_msg(LOG_DEFAULT, COLOR_RED "Error: Unknown option '%s'\n" COLOR_RESET, opt);
+#define MSG_NO_OPTION_SPECIFIED(cmd) \
+    log_msg( \
+        LOG_DEFAULT, \
+        COLOR_RED "Error: No options specified for '%s' command.\n" \
+        COLOR_YELLOW "Hint: Use '--help' to see available options.\n" COLOR_RESET, cmd \
+    )
 #define MSG_REPO_EXISTS \
     log_msg( \
         LOG_DEFAULT, \

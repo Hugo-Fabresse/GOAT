@@ -10,12 +10,18 @@
 
 #include "commands/init/init.h"
 
-void set_force(cmd_opts_t *opts)
+void set_init_force(cmd_opts_t *opts)
 {
     opts->cmd_specific.init.force = true;
 }
 
-void set_quiet(cmd_opts_t *opts)
+void set_init_quiet(cmd_opts_t *opts)
 {
     opts->cmd_specific.init.quiet = true;
 }
+
+void set_init_help(cmd_opts_t *opts)
+{
+    opts->cmd_specific.init.help = true;
+}
+

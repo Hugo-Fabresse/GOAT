@@ -28,8 +28,9 @@
 
 // Option definitions for add command
 static const option_entry_t add_options[] = {
-    {"--all", "Add all modified files to the staging area", set_all},
-    {"--update", "Update only files that are already tracked", set_update}
+    {"--all", "Add all modified files to the staging area", set_add_all},
+    {"--update", "Update only files that are already tracked", set_add_update},
+    {"--help", "Show this help message", set_add_help}
 };
 
 // Command options structure
@@ -203,6 +204,7 @@ int parse_add_options(int argc, char **argv, cmd_opts_t *opts)
 {
     opts->cmd_specific.add.all = false;
     opts->cmd_specific.add.update = false;
+    opts->cmd_specific.add.help = false;
     return parse_options(argc, argv, &add_cmd_opts, opts);
 }
 
@@ -210,11 +212,16 @@ int cmd_add(cmd_opts_t *opts)
 {
     add_handler_t handlers[ADD_HANDLERS_COUNT];
 
+    if (opts->cmd_specific.add.help) {
+        print_command_usage(&add_cmd_opts);
+        return 0;
+    }
     memcpy(handlers, add_handlers, sizeof(handlers));
     set_handlers_flags(handlers, opts);
     for (size_t i = 0; i < ADD_HANDLERS_COUNT; i++) {
         if (*(handlers[i].flag))
             return handlers[i].func();
     }
+    MSG_NO_OPTION_SPECIFIED("add");
     return 0;
 }
