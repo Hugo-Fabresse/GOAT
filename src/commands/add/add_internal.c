@@ -10,14 +10,19 @@
 
 #include "commands/add/add.h"
 
-void set_all(cmd_opts_t *opts)
+void set_add_all(cmd_opts_t *opts)
 {
     opts->cmd_specific.add.all = true;
 }
 
-void set_update(cmd_opts_t *opts)
+void set_add_update(cmd_opts_t *opts)
 {
     opts->cmd_specific.add.update = true;
+}
+
+void set_add_help(cmd_opts_t *opts)
+{
+    opts->cmd_specific.add.help = true;
 }
 
 void set_handlers_flags(add_handler_t *handlers, cmd_opts_t *opts)

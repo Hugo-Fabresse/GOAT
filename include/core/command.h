@@ -21,11 +21,13 @@ typedef struct cmd_opts {
         struct {
             bool force;
             bool quiet;
+            bool help;
         } init;
 
         struct {
             bool all;
             bool update;
+            bool help;
         } add;
 
     } cmd_specific;

@@ -51,8 +51,9 @@ int cmd_add(cmd_opts_t *opts);
 int parse_add_options(int argc, char **argv, cmd_opts_t *opts);
 
 // Command-specific option handlers
-void set_all(cmd_opts_t *opts);
-void set_update(cmd_opts_t *opts);
+void set_add_all(cmd_opts_t *opts);
+void set_add_update(cmd_opts_t *opts);
+void set_add_help(cmd_opts_t *opts);
 
 // Wrapper functions (moved to add_handlers.c)
 int update_tracked_files_wrapper(void);

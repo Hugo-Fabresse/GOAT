@@ -34,8 +34,9 @@ static const struct path_mode {
 
 // Option definitions for init command
 static const option_entry_t init_options[] = {
-    {"--force", "Reinitialize and overwrite an existing repository", set_force},
-    {"--quiet", "Suppress output messages", set_quiet}
+    {"--force", "Reinitialize and overwrite an existing repository", set_init_force},
+    {"--quiet", "Suppress output messages", set_init_quiet},
+    {"--help", "Show this help message", set_init_help}
 };
 
 // Command options structure
@@ -78,11 +79,16 @@ int parse_init_options(int argc, char **argv, cmd_opts_t *opts)
 {
     opts->cmd_specific.init.force = false;
     opts->cmd_specific.init.quiet = false;
+    opts->cmd_specific.init.help = false;
     return parse_options(argc, argv, &init_cmd_opts, opts);
 }
 
 int cmd_init(cmd_opts_t *opts)
 {
+    if (opts->cmd_specific.init.help) {
+        print_command_usage(&init_cmd_opts);
+        return 0;
+    }
     if (check_already_initialized() && !opts->cmd_specific.init.force) {
         MSG_REPO_EXISTS;
         return 1;
