@@ -20,7 +20,7 @@
 // ===== General Messages =====
 #define MSG_USAGE(progname) \
     log_msg(LOG_DEFAULT, COLOR_BLUE "Usage: %s <command>\n" COLOR_RESET, progname); \
-    log_msg(LOG_DEFAULT, COLOR_YELLOW "Hint: Available commands are: init - add\n" COLOR_RESET)
+    log_msg(LOG_DEFAULT, COLOR_YELLOW "Hint: Available commands are: init - add - commit\n" COLOR_RESET)
 #define MSG_UNKNOWN_COMMAND(cmd) \
     log_msg(LOG_DEFAULT, COLOR_RED "Error: Unknown command '%s'\n" COLOR_RESET, cmd)
 
@@ -104,5 +104,15 @@
     log_msg(LOG_ERROR, COLOR_RED "Error: Unable to update index file %s\n" COLOR_RESET, path)
 #define MSG_INDEX_OPEN_FAILED(path) \
     log_msg(LOG_ERROR, COLOR_RED "Error: Unable to open index file for writing: %s\n" COLOR_RESET, path)
+
+// ===== Commit Command Messages =====
+#define MSG_COMMIT_SUCCESS(hash, message) \
+    log_msg(LOG_DEFAULT, COLOR_GREEN "Committed %s - \"%s\"\n" COLOR_RESET, hash, message)
+#define MSG_COMMIT_NO_MESSAGE \
+    log_msg(LOG_DEFAULT, COLOR_RED "Error: Missing commit message. Use -m \"message\"\n" COLOR_RESET)
+#define MSG_COMMIT_NOTHING_TO_COMMIT \
+    log_msg(LOG_DEFAULT, COLOR_RED "Error: Nothing to commit (index is empty)\n" COLOR_RESET)
+#define MSG_COMMIT_FAILED \
+    log_msg(LOG_DEFAULT, COLOR_RED "Error: Failed to create commit\n" COLOR_RESET)
 
 #endif // MESSAGES_H

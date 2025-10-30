@@ -8,6 +8,7 @@
 #include "core/hash.h"
 #include <openssl/evp.h>
 #include <stdio.h>
+#include <string.h>
 
 static EVP_MD_CTX *init_sha256_ctx(void)
 {
@@ -70,6 +71,27 @@ int hash_file_to_hex(const char *path, char *hex_output)
     if (hash_file_sha256(path, hash_binary) != 0) {
         return -1;
     }
+    hash_to_hex(hash_binary, hex_output);
+    return 0;
+}
+
+int hash_string_to_hex(const char *input, char *hex_output)
+{
+    EVP_MD_CTX *ctx = init_sha256_ctx();
+    unsigned char hash_binary[SHA256_DIGEST_LENGTH];
+
+    if (!ctx) {
+        return -1;
+    }
+    if (EVP_DigestUpdate(ctx, input, strlen(input)) != 1) {
+        EVP_MD_CTX_free(ctx);
+        return -1;
+    }
+    if (EVP_DigestFinal_ex(ctx, hash_binary, NULL) != 1) {
+        EVP_MD_CTX_free(ctx);
+        return -1;
+    }
+    EVP_MD_CTX_free(ctx);
     hash_to_hex(hash_binary, hex_output);
     return 0;
 }
