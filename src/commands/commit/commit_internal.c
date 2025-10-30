@@ -17,6 +17,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 void set_commit_message(cmd_opts_t *opts)
 {
@@ -226,13 +227,38 @@ static int load_parent_hash(char *parent_hash)
     return 0;
 }
 
+static int get_user_info(char *user_info, size_t size)
+{
+    const char *username = getenv("USER");
+    const char *email = getenv("EMAIL");
+    int written;
+
+    if (!username)
+        username = getenv("USERNAME");
+    if (!username)
+        username = "unknown";
+    if (!email)
+        written = snprintf(user_info, size, "%s <user@goat>", username);
+    else
+        written = snprintf(user_info, size, "%s <%s>", username, email);
+    if (written < 0 || (size_t)written >= size)
+        return -1;
+    return 0;
+}
+
 static int build_commit_content(commit_data_t *data, char *content)
 {
+    char user_info[256];
+
+    if (get_user_info(user_info, sizeof(user_info)) < 0) {
+        return -1;
+    }
     return snprintf(content, 4096,
-        "tree:\n%s%sparent: %s\nauthor: hugo <user@goat>\ndate: %s\nmessage: %s\n",
+        "tree:\n%s%sparent: %s\nauthor: %s\ndate: %s\nmessage: %s\n",
         data->tree_content,
         data->tree_content[strlen(data->tree_content)-1] == '\n' ? "" : "\n",
         data->parent_hash,
+        user_info,
         data->timestamp,
         data->message);
 }
