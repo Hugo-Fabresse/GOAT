@@ -36,3 +36,16 @@ int get_file_timestamp(const char *path, char *timestamp_buffer, size_t bufsize)
     snprintf(timestamp_buffer, bufsize, "%ld", st.st_mtime);
     return 0;
 }
+
+int get_iso_timestamp(char *timestamp_buffer, size_t bufsize)
+{
+    time_t now = time(NULL);
+    struct tm *tm_info = localtime(&now);
+
+    if (!tm_info) {
+        return -1;
+    }
+    strftime(timestamp_buffer, bufsize, "%Y-%m-%dT%H:%M:%S", tm_info);
+    return 0;
+}
+

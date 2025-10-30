@@ -15,6 +15,7 @@
 
 int hash_file_sha256(const char *path, unsigned char *out_hash);
 int hash_file_to_hex(const char *path, char *hex_output);
+int hash_string_to_hex(const char *input, char *hex_output);
 void hash_to_hex(const unsigned char *hash, char *hex_output);
 
 #endif // HASH_H

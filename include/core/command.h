@@ -30,6 +30,11 @@ typedef struct cmd_opts {
             bool help;
         } add;
 
+        struct {
+            bool message;
+            bool help;
+        } commit;
+
     } cmd_specific;
 } cmd_opts_t;
 
