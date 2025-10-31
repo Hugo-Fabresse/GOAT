@@ -35,6 +35,12 @@ typedef struct cmd_opts {
             bool help;
         } commit;
 
+        struct {
+            bool help;
+            bool short_format;
+            bool branch;
+        } status;
+
     } cmd_specific;
 } cmd_opts_t;
 

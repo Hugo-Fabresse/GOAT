@@ -11,6 +11,7 @@
 #include "commands/init/init.h"
 #include "commands/add/add.h"
 #include "commands/commit/commit.h"
+#include "commands/status/status.h"
 #include "ui/messages.h"
 #include <string.h>
 #include <stddef.h>
@@ -19,7 +20,8 @@
 const command_entry_t commands[] = {
         {"init", parse_init_options, cmd_init},
         {"add",  parse_add_options,  cmd_add},
-        {"commit", parse_commit_options, cmd_commit}
+        {"commit", parse_commit_options, cmd_commit},
+        {"status", parse_status_options, cmd_status}
 };
 
 // Number of commands
