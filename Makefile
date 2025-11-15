@@ -40,7 +40,9 @@ SRCS = $(SRC_DIR)/main.c \
        $(SRC_DIR)/commands/add/add_handlers.c \
        $(SRC_DIR)/commands/commit/commit.c \
        $(SRC_DIR)/commands/commit/commit_internal.c \
-       $(SRC_DIR)/commands/commit/commit_handlers.c
+       $(SRC_DIR)/commands/commit/commit_handlers.c \
+       $(SRC_DIR)/commands/status/status.c \
+       $(SRC_DIR)/commands/status/status_internal.c
 
 # Object files
 OBJS = $(SRCS:.c=.o)
@@ -74,7 +76,9 @@ TEST_OBJS = $(BUILD_DIR)/utils/fs.o \
             $(BUILD_DIR)/commands/add/add_handlers.o \
             $(BUILD_DIR)/commands/commit/commit.o \
             $(BUILD_DIR)/commands/commit/commit_internal.o \
-            $(BUILD_DIR)/commands/commit/commit_handlers.o
+            $(BUILD_DIR)/commands/commit/commit_handlers.o \
+            $(BUILD_DIR)/commands/status/status.o \
+            $(BUILD_DIR)/commands/status/status_internal.o
 
 # Test-specific objects with coverage flags
 TEST_COV_OBJS = $(BUILD_DIR)/test_utils/fs.o \
@@ -96,7 +100,9 @@ TEST_COV_OBJS = $(BUILD_DIR)/test_utils/fs.o \
                 $(BUILD_DIR)/test_commands/add/add_handlers.o \
                 $(BUILD_DIR)/test_commands/commit/commit.o \
                 $(BUILD_DIR)/test_commands/commit/commit_internal.o \
-                $(BUILD_DIR)/test_commands/commit/commit_handlers.o
+                $(BUILD_DIR)/test_commands/commit/commit_handlers.o \
+                $(BUILD_DIR)/test_commands/status/status.o \
+		$(BUILD_DIR)/test_commands/status/status_internal.o
 
 tests: $(TEST_BINS)
 

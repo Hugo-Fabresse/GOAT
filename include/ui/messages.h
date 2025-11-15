@@ -58,6 +58,13 @@
 #define MSG_NO_REPO_FOUND \
     log_msg(LOG_ERROR, "No repository found.\n")
 
+// ===== Status Command Messages =====
+#define MSG_STATUS_USAGE \
+    COLOR_BLUE "usage: goat status [<options>]\n" COLOR_RESET \
+    "\n" \
+    "    -s, --short    Show status in short format\n" \
+    "    -v, --verbose  Show verbose output\n"
+
 // Add operation headers
 #define MSG_ADD_ALL_HEADER \
     log_msg(LOG_DEFAULT, COLOR_BLUE "Adding all files to staging area...\n" COLOR_RESET)
@@ -114,5 +121,10 @@
     log_msg(LOG_DEFAULT, COLOR_RED "Error: Nothing to commit (index is empty)\n" COLOR_RESET)
 #define MSG_COMMIT_FAILED \
     log_msg(LOG_DEFAULT, COLOR_RED "Error: Failed to create commit\n" COLOR_RESET)
+
+// Dans messages.h, après les autres macros
+#define MSG_NOT_A_REPO \
+    log_msg(LOG_DEFAULT, COLOR_RED "Error: Not a GOAT repository\n" COLOR_YELLOW \
+            "Hint: Run 'goat init' to initialize a repository\n" COLOR_RESET)
 
 #endif // MESSAGES_H
